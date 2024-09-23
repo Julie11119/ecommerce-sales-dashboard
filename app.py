@@ -61,31 +61,42 @@ st.title('🛍️ E-commerce Sales Dashboard')
 # Sidebar filters
 st.sidebar.header('Filter Options')
 
-# Date range filter
-min_date = df['order_date'].min()
-max_date = df['order_date'].max()
-start_date = st.sidebar.date_input('Start date', min_value=min_date, max_value=max_date, value=min_date)
-end_date = st.sidebar.date_input('End date', min_value=min_date, max_value=max_date, value=max_date)
+# Organize filters into expanders
+with st.sidebar.expander("Date Range", expanded=True):
+    # Date range filter
+    min_date = df['order_date'].min()
+    max_date = df['order_date'].max()
+    start_date = st.date_input('Start date', min_value=min_date, max_value=max_date, value=min_date)
+    end_date = st.date_input('End date', min_value=min_date, max_value=max_date, value=max_date)
 
-# Category filter
-categories = df['category'].unique()
-selected_categories = st.sidebar.multiselect('Select Categories', categories, default=categories)
+with st.sidebar.expander("Category Filters", expanded=True):
+    # Category filter
+    categories = df['category'].unique()
+    selected_categories = st.multiselect('Select Categories', categories, default=categories)
+    
+    # Update subcategories based on selected categories
+    if selected_categories:
+        filtered_subcategories = df[df['category'].isin(selected_categories)]['subcategory'].unique()
+    else:
+        filtered_subcategories = df['subcategory'].unique()
+    
+    # Subcategory filter
+    selected_subcategories = st.multiselect('Select Subcategories', filtered_subcategories, default=filtered_subcategories)
 
-# Subcategory filter
-subcategories = df['subcategory'].unique()
-selected_subcategories = st.sidebar.multiselect('Select Subcategories', subcategories, default=subcategories)
+with st.sidebar.expander("Customer Demographics", expanded=False):
+    # Gender filter
+    genders = df['gender'].unique()
+    selected_genders = st.multiselect('Select Genders', genders, default=genders)
+    
+    # Age group filter
+    age_groups = df['age_group'].unique()
+    selected_age_groups = st.multiselect('Select Age Groups', age_groups, default=age_groups)
 
-# Gender filter
-genders = df['gender'].unique()
-selected_genders = st.sidebar.multiselect('Select Genders', genders, default=genders)
+with st.sidebar.expander("Payment Methods", expanded=False):
+    # Payment method filter
+    payment_methods = df['payment_method'].unique()
+    selected_payment_methods = st.multiselect('Select Payment Methods', payment_methods, default=payment_methods)
 
-# Age group filter
-age_groups = df['age_group'].unique()
-selected_age_groups = st.sidebar.multiselect('Select Age Groups', age_groups, default=age_groups)
-
-# Payment method filter
-payment_methods = df['payment_method'].unique()
-selected_payment_methods = st.sidebar.multiselect('Select Payment Methods', payment_methods, default=payment_methods)
 
 # Apply filters
 mask = (
